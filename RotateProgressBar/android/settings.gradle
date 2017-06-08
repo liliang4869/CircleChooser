@@ -1,0 +1,3 @@
+rootProject.name = 'RotateProgressBar'
+
+include ':app'
