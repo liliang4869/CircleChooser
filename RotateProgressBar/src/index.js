@@ -36,10 +36,15 @@ export default class ProgressChooser extends Component{
       },
       onPanResponderMove: (evt, gestureState) => {
       let beginAngle=this.getArcByLocation(evt.nativeEvent.pageX-this.leftx,evt.nativeEvent.pageY-this.topy);
-
-      this.state.Angle=this.state.Angle-beginAngle+this.state.beginAngle;
-      this.state.beginAngle=beginAngle;
-
+      if(beginAngle<0)return;
+      let curAngle=this.state.Angle-beginAngle+this.state.beginAngle;
+      if(curAngle<-0.2)return;
+      if(curAngle<=0){
+          this.state.beginAngle=this.state.Angle+this.state.beginAngle;
+      }else
+      {
+      this.state.beginAngle=beginAngle;}
+    this.state.Angle=curAngle<0?0:curAngle;
       let res=this.getLocationByArc(this.state.beginAngle,this.state.Angle);
       this.setState({path:res.path});
       Animated.timing(this.state.beginLocation,{toValue:{x:res.begin.x,y:res.begin.y},duration:0}).start(); 
@@ -73,13 +78,13 @@ export default class ProgressChooser extends Component{
 //begin 开始角度， arc 弧度  均为逆时针
     getLocationByArc(beginAngle,Angle){
 
-        let radius=this.props.style.height*0.5-this.props.strokeWidth*0.5;
+        let radius=this.props.style.height*0.5-this.props.SliderStyle.width*0.5;
         let dgr=Math.PI*Angle;
         let defaultdgr=Math.PI*beginAngle;
-        let dflocationx=radius*(1+Math.cos(-1*defaultdgr))+this.props.strokeWidth*0.5
-         let dflocationy=radius*(1-Math.sin(-1*defaultdgr))+this.props.strokeWidth*0.5
-        let locationX=radius*(1+Math.cos(-1*defaultdgr-dgr))+this.props.strokeWidth*0.5
-        let locationY=radius*(1-Math.sin(-1*defaultdgr-dgr))+this.props.strokeWidth*0.5
+        let dflocationx=radius*(1+Math.cos(defaultdgr))+this.props.SliderStyle.width*0.5
+         let dflocationy=radius*(1+Math.sin(defaultdgr))+this.props.SliderStyle.width*0.5
+        let locationX=radius*(1+Math.cos(defaultdgr+dgr))+this.props.SliderStyle.width*0.5
+        let locationY=radius*(1+Math.sin(defaultdgr+dgr))+this.props.SliderStyle.width*0.5
         let path = Path().moveTo(dflocationx, dflocationy)
       .arcTo(locationX, locationY,radius,radius,dgr>Math.PI?1:0);
     return {path:path,begin:{x:dflocationx,y:dflocationy},end:{x:locationX,y:locationY}
@@ -90,17 +95,18 @@ export default class ProgressChooser extends Component{
 getArcByLocation(x,y)
 {let tX=x-this.props.style.width*0.5;let tY=y-this.props.style.height*0.5;
 
-    let res=Math.atan(tY/tX)/Math.PI;if(tX<0 && tY<0)res-=1;if(tX<0 && tY>0)res+=1;
-    console.log(res)
+    let res=Math.atan(tY/tX)/Math.PI;if(tX>0 && tY<0)res+=2;if(tX<0)res+=1;
+    console.log(res);
+    if(res<0.5 && res >0.3)res=0.5;if(res <=0.3)res=-1;
     return res
 }
 }
 ProgressChooser.defaultProps={
     style:{height:200,width:200},
-    strokeWidth:10,
-    defaultAngle:0.25,
+    strokeWidth:25,
+    defaultAngle:0.5,
     Angle:0.5,
     SliderStyle:{
-        height:30,width:30,backgroundColor:'blue'
+        height:35,width:35,backgroundColor:'blue'
     }
 }
