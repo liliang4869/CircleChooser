@@ -105,17 +105,9 @@ export default class ProgressChooser extends Component {
                     , position: 'absolute', top: -.5 * this.props.SliderStyle.height, left: -.5 * this.props.SliderStyle.width,
                     transform: [{ translateX: this.state.beginLocation.x }, { translateY: this.state.beginLocation.y }]
                 }}>
-                <View style={{ height: this.props.SliderStyle.height, width: this.props.SliderStyle.width, borderRadius: this.props.SliderStyle.height * 0.5, backgroundColor: this.props.SliderStyle.backgroundColor }} />
+                <View style={{ height: this.props.SliderStyle.height, width: this.props.SliderStyle.width, borderRadius: this.props.SliderStyle.height * 0.5, backgroundColor: this.props.SliderStyle.backgroundColor[0] }} />
             </Animated.View>
-            <Animated.View
-                {... this.beginThumbResponder.panHandlers}
-                style={{
-                    height: this.props.SliderStyle.height, width: this.props.SliderStyle.width
-                    , position: 'absolute', top: -.5 * this.props.SliderStyle.height, left: -.5 * this.props.SliderStyle.width,
-                    transform: [{ translateX: this.state.beginLocation.x }, { translateY: this.state.beginLocation.y }]
-                }}>
-                <View style={{ height: this.props.SliderStyle.height, width: this.props.SliderStyle.width, borderRadius: this.props.SliderStyle.height * 0.5, backgroundColor: this.props.SliderStyle.backgroundColor }} />
-            </Animated.View>
+        
             <Animated.View
                 {...this.endThumbResponder.panHandlers}
                 style={{
@@ -123,7 +115,7 @@ export default class ProgressChooser extends Component {
                     , position: 'absolute', top: -.5 * this.props.SliderStyle.height, left: -.5 * this.props.SliderStyle.width,
                     transform: [{ translateX: this.state.endLocation.x }, { translateY: this.state.endLocation.y }]
                 }}>
-                <View style={{ height: this.props.SliderStyle.height, width: this.props.SliderStyle.width, borderRadius: this.props.SliderStyle.height * 0.5, backgroundColor: this.props.SliderStyle.backgroundColor }} />
+                <View style={{ height: this.props.SliderStyle.height, width: this.props.SliderStyle.width, borderRadius: this.props.SliderStyle.height * 0.5, backgroundColor: this.props.SliderStyle.backgroundColor[1] }} />
             </Animated.View>
         </View>)
     }
@@ -161,6 +153,6 @@ ProgressChooser.defaultProps = {
     defaultAngle: 1,//起始角度
     Angle: 0.5,//进度弧度大小
     SliderStyle: {
-        height: 35, width: 35, backgroundColor: 'blue'
+        height: 35, width: 35, backgroundColor: ['blue','green']
     }//Thumb样式
 }
