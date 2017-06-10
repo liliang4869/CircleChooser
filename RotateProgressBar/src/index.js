@@ -1,11 +1,12 @@
-import React, { Component } from 'react';
+import React, { Component} from 'react';
 import {
     StyleSheet,
     Text,
     View,
     Animated,
     ART,
-    PanResponder, UIManager
+    PanResponder, UIManager,
+    NetInfo
 } from 'react-native';
 var {
   Surface,
@@ -43,12 +44,12 @@ export default class ProgressChooser extends Component {
                 if (beginAngle < 0) return;
                 let curAngle = this.state.Angle - beginAngle + this.state.beginAngle;
                 if (curAngle < -0.1) return;
-                if (curAngle <= 0.1) {
-                    this.state.beginAngle = this.state.Angle + this.state.beginAngle - 0.1;
+                if (curAngle <= 0.05) {
+                    this.state.beginAngle = this.state.Angle + this.state.beginAngle - 0.05;
                 } else {
                     this.state.beginAngle = beginAngle;
                 }
-                this.state.Angle = curAngle <= 0.1 ? 0.1 : curAngle;
+                this.state.Angle = curAngle <= 0.05 ? 0.05 : curAngle;
                 let res = this.getLocationByArc(this.state.beginAngle, this.state.Angle);
                 this.setState({ path: res.path });
                 Animated.timing(this.state.beginLocation, { toValue: { x: res.begin.x, y: res.begin.y }, duration: 0 }).start();
@@ -74,9 +75,9 @@ export default class ProgressChooser extends Component {
                 let endAngle = this.getArcByLocation(evt.nativeEvent.pageX - this.leftx, evt.nativeEvent.pageY - this.topy);
                 let curAngle = endAngle - this.state.beginAngle
                 if (curAngle < -0.1) return;
-                this.state.Angle = curAngle <= 0.1 ? 0.1 : curAngle;
+                this.state.Angle = curAngle <= 0.05 ? 0.05 : curAngle;
                 let res = this.getLocationByArc(this.state.beginAngle, this.state.Angle);
-                console.log(res.end)
+
                  Animated.timing(this.state.endLocation, { toValue: { x: res.end.x, y: res.end.y } , duration: 0}).start();
                 this.setState({ path: res.path });
          
@@ -133,7 +134,6 @@ export default class ProgressChooser extends Component {
         let radius = this.props.style.height * 0.5 - this.props.SliderStyle.width * 0.5;
         let dgr = Math.PI * Angle;
         let defaultdgr = Math.PI * beginAngle;
-        console.log(Math.sin(dgr+defaultdgr),Math.cos(dgr+defaultdgr),dgr+defaultdgr)
         let dflocationx = radius * (1 + Math.cos(defaultdgr)) + this.props.SliderStyle.width * 0.5
         let dflocationy = radius * (1 + Math.sin(defaultdgr)) + this.props.SliderStyle.width * 0.5
         let locationX = radius * (1 + Math.cos(defaultdgr + dgr)) + this.props.SliderStyle.width * 0.5
@@ -151,8 +151,7 @@ export default class ProgressChooser extends Component {
 
         let res = Math.atan(tY / tX) / Math.PI; if (tX > 0 && tY < 0) res += 2; if (tX < 0) res += 1;
       
-        if (res < 0.5 && res > 0.4) res = 0.5; if (res <= 0.4) res = -1;
-          console.log('resangle',res);
+        // if (res < 0.5 && res > 0.4) res = 0.5; else if (res>0 &&res <= 0.1) res = 2;else if(res>=0.1 && res<=0.4)
         return res
     }
 }
