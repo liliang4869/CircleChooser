@@ -124,7 +124,6 @@ export default class ProgressChooser extends Component {
     getLocationByArc(beginAngle, Angle) {
            let za=this.props.ZeroAngle%2;
         beginAngle+=za;
-
         if (beginAngle + Angle > 2+za) Angle = 2 - beginAngle
         let radius = this.props.style.height * 0.5 - this.props.SliderStyle.width * 0.5;
         let dgr = Math.PI * Angle;
@@ -146,7 +145,8 @@ export default class ProgressChooser extends Component {
 
         let res = Math.atan(tY / tX) / Math.PI; if (tX > 0 && tY < 0) res += 2; if (tX < 0) res += 1;
         let za=this.props.ZeroAngle%2;
-        if(res>2-za)res-=za;else if(res<za)res+=2-za;else res-=za;
+        res-=za;
+        if(res>2)res-=2;else if(res<0)res+=2;
         return res
     }
 }
@@ -158,5 +158,5 @@ ProgressChooser.defaultProps = {
     SliderStyle: {
         height: 35, width: 35, backgroundColor: ['blue','green']
     },//Thumb样式
-    ZeroAngle:0.8
+    ZeroAngle:-1.2
 }
