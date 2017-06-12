@@ -57,7 +57,7 @@ export default class ProgressChooser extends Component {
             },
             onPanResponderTerminationRequest: (evt, gestureState) => false,
             onPanResponderRelease: (evt, gestureState) => {
-
+                    console.log(this.state.beginAngle,this.state.Angle,'-----------')
             },
 
         });
@@ -122,7 +122,10 @@ export default class ProgressChooser extends Component {
 
     //beginAngle 开始角度， Angle 弧度  均为逆时针  0->0  2->2PI
     getLocationByArc(beginAngle, Angle) {
-        if (beginAngle + Angle > 2) Angle = 2 - beginAngle
+           let za=this.props.ZeroAngle%2;
+        beginAngle+=za;
+
+        if (beginAngle + Angle > 2+za) Angle = 2 - beginAngle
         let radius = this.props.style.height * 0.5 - this.props.SliderStyle.width * 0.5;
         let dgr = Math.PI * Angle;
         let defaultdgr = Math.PI * beginAngle;
@@ -142,8 +145,8 @@ export default class ProgressChooser extends Component {
         let tX = x - this.props.style.width * 0.5; let tY = y - this.props.style.height * 0.5;
 
         let res = Math.atan(tY / tX) / Math.PI; if (tX > 0 && tY < 0) res += 2; if (tX < 0) res += 1;
-      
-        // if (res < 0.5 && res > 0.4) res = 0.5; else if (res>0 &&res <= 0.1) res = 2;else if(res>=0.1 && res<=0.4)
+        let za=this.props.ZeroAngle%2;
+        if(res>2-za)res-=za;else if(res<za)res+=2-za;else res-=za;
         return res
     }
 }
@@ -154,5 +157,6 @@ ProgressChooser.defaultProps = {
     Angle: 0.5,//进度弧度大小
     SliderStyle: {
         height: 35, width: 35, backgroundColor: ['blue','green']
-    }//Thumb样式
+    },//Thumb样式
+    ZeroAngle:0.8
 }
