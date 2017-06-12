@@ -1,4 +1,4 @@
-import React, { Component} from 'react';
+import React, { Component } from 'react';
 import {
     StyleSheet,
     Text,
@@ -40,24 +40,33 @@ export default class ProgressChooser extends Component {
             onPanResponderGrant: (evt, gestureState) => {
             },
             onPanResponderMove: (evt, gestureState) => {
+                let za = this.props.ZeroAngle % 2;
+                let ma = this.props.MaxAngle % 2;
+                if (za < 0) za += 2
+                if (ma <= 0) ma += 2
                 let beginAngle = this.getArcByLocation(evt.nativeEvent.pageX - this.leftx, evt.nativeEvent.pageY - this.topy);
                 if (beginAngle < 0) return;
                 let curAngle = this.state.Angle - beginAngle + this.state.beginAngle;
                 if (curAngle < -0.1) return;
-                if (curAngle <= 0.05) {
-                    this.state.beginAngle = this.state.Angle + this.state.beginAngle - 0.05;
+                else if (curAngle <= 0.05) {
+                    this.state.beginAngle = this.state.Angle+this.state.beginAngle-0.05;
+                    this.state.Angle = 0.05;
+                } else if (curAngle > ma) {
+                    this.state.beginAngle = 0;
+                    this.state.Angle = ma;
                 } else {
                     this.state.beginAngle = beginAngle;
+                    this.state.Angle = curAngle <= 0.05 ? 0.05 : curAngle;
                 }
-                this.state.Angle = curAngle <= 0.05 ? 0.05 : curAngle;
+                
                 let res = this.getLocationByArc(this.state.beginAngle, this.state.Angle);
                 this.setState({ path: res.path });
                 Animated.timing(this.state.beginLocation, { toValue: { x: res.begin.x, y: res.begin.y }, duration: 0 }).start();
-                Animated.timing(this.state.endLocation, { toValue: { x: res.end.x, y: res.end.y}, duration: 0  }).start();
+                Animated.timing(this.state.endLocation, { toValue: { x: res.end.x, y: res.end.y }, duration: 0 }).start();
             },
             onPanResponderTerminationRequest: (evt, gestureState) => false,
             onPanResponderRelease: (evt, gestureState) => {
-                    console.log(this.state.beginAngle,this.state.Angle,'-----------')
+                console.log(this.state.beginAngle, this.state.Angle, '-----------')
             },
 
         });
@@ -78,11 +87,11 @@ export default class ProgressChooser extends Component {
                 this.state.Angle = curAngle <= 0.05 ? 0.05 : curAngle;
                 let res = this.getLocationByArc(this.state.beginAngle, this.state.Angle);
 
-                 Animated.timing(this.state.endLocation, { toValue: { x: res.end.x, y: res.end.y } , duration: 0}).start();
+                Animated.timing(this.state.endLocation, { toValue: { x: res.end.x, y: res.end.y }, duration: 0 }).start();
                 this.setState({ path: res.path });
-         
+
                 Animated.timing(this.state.beginLocation, { toValue: { x: res.begin.x, y: res.begin.y }, duration: 0 }).start();
-               
+
             },
             onPanResponderTerminationRequest: (evt, gestureState) => false,
             onPanResponderRelease: (evt, gestureState) => {
@@ -107,7 +116,7 @@ export default class ProgressChooser extends Component {
                 }}>
                 <View style={{ height: this.props.SliderStyle.height, width: this.props.SliderStyle.width, borderRadius: this.props.SliderStyle.height * 0.5, backgroundColor: this.props.SliderStyle.backgroundColor[0] }} />
             </Animated.View>
-        
+
             <Animated.View
                 {...this.endThumbResponder.panHandlers}
                 style={{
@@ -122,9 +131,14 @@ export default class ProgressChooser extends Component {
 
     //beginAngle 开始角度， Angle 弧度  均为逆时针  0->0  2->2PI
     getLocationByArc(beginAngle, Angle) {
-           let za=this.props.ZeroAngle%2;
-        beginAngle+=za;
-        if (beginAngle + Angle > 2+za) Angle = 2 - beginAngle
+        let za = this.props.ZeroAngle % 2;
+        let ma = this.props.MaxAngle % 2;
+        if (za < 0) za += 2
+        if (ma <= 0) ma += 2
+        beginAngle += za;
+
+        console.log(beginAngle, Angle, ma, za)
+        if (beginAngle + Angle > ma + za) Angle = ma - beginAngle + za
         let radius = this.props.style.height * 0.5 - this.props.SliderStyle.width * 0.5;
         let dgr = Math.PI * Angle;
         let defaultdgr = Math.PI * beginAngle;
@@ -144,19 +158,21 @@ export default class ProgressChooser extends Component {
         let tX = x - this.props.style.width * 0.5; let tY = y - this.props.style.height * 0.5;
 
         let res = Math.atan(tY / tX) / Math.PI; if (tX > 0 && tY < 0) res += 2; if (tX < 0) res += 1;
-        let za=this.props.ZeroAngle%2;
-        res-=za;
-        if(res>2)res-=2;else if(res<0)res+=2;
+        let za = this.props.ZeroAngle % 2;
+        if (za < 0) za += 2
+        res -= za;
+        if (res > 2) res -= 2; else if (res < 0) res += 2;
         return res
     }
 }
 ProgressChooser.defaultProps = {
     style: { height: 200, width: 200 },//大小
     strokeWidth: 25,//进度条粗细
-    defaultAngle: 1,//起始角度
+    defaultAngle: 0,//起始角度
     Angle: 0.5,//进度弧度大小
     SliderStyle: {
-        height: 35, width: 35, backgroundColor: ['blue','green']
+        height: 35, width: 35, backgroundColor: ['blue', 'green']
     },//Thumb样式
-    ZeroAngle:-1.2
+    ZeroAngle: -3.2,
+    MaxAngle: 2
 }
